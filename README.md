@@ -1,8 +1,8 @@
 # KADGN
-This repository provides PyTorch implementations of **KADGN** as described in the paper: **Knowledge Augmented Dual-attention Gating Network in Knowledge Graph for Link Prediction**.
+This repository provides PyTorch implementations of **KAAGE** as described in the paper: **Knowledge Augmented Attention Gating Embedding for Link Prediction**.
 
 
-![framework](https://github.com/22zwChen/KADGN/blob/07ffcc09b47808bce4d3c606e7680c8c4a554e5e/framework.png)
+![framework](https://github.com/22zwChen/KAAGE/blob/b6d314537dca3663f5febbaa42ddb8c0bb0354d0/framework_meeting.png)
 
 ## Experiment Environment
 - python 3.7.13
@@ -37,28 +37,6 @@ Now you are ready to train and evaluate KADGN. To reproduce the results provided
 
 #### Credit
     python train.py --data credit --epoch 1000 --batch 128 --gcn_drop 0.5 --embed_dim 300 --num_heads 3
-
-### Ablation
-
-#### -gate
-Change the code in the top of **./model/BAGCN.py**:  
-    agg = "gate2" -> agg = "MLP"
-
-Then run the command mentioned above.
-
-#### single gate
-Change the code in the top of **./model/BAGCN.py**:  
-    agg = "gate2" -> agg = "gate1" 
-
-Then run the command mentioned above.
-
-#### -inv
-Before you do the ablation experiment (**-inv**), you need to replace these files as below and remember to backup original files:  
-    ./helper.py -> ./helper_abl.py  
-    ./model/BAGCN.py -> ./model/BAGCN_abl.py  
-
-Then run the code of ablation experiments by another python file:  
-    ./train_ablation.py
 
 
 ## Acknowledgement
