@@ -49,10 +49,8 @@ class TrainDataset(Dataset):
         pos_tail = triple[2]
         mask = np.ones([self.p.num_ent], dtype=np.bool)  # one-hot编码的变形
         mask[label] = 0  # 将真实出现的标签位置标记为0,在下一步中，只在为1的位置进行采样，也就是负采样
-        if self.p.dataset == "credit":
-            neg_tail = np.int32(np.random.choice(self.entities[mask], self.p.neg_sampe_ratio, replace=True)).reshape([-1])
-        else:
-            neg_tail = np.int32(np.random.choice(self.entities[mask], self.p.neg_sampe_ratio, replace=False)).reshape([-1])  # false：不能取相同的数
+
+        neg_tail = np.int32(np.random.choice(self.entities[mask], self.p.neg_sampe_ratio, replace=False)).reshape([-1])  # false：不能取相同的数
         neg_tail = np.concatenate((pos_tail.reshape([-1]), neg_tail))  # 连接真标签和负采样id
 
         return neg_tail
