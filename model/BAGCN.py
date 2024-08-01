@@ -1,7 +1,5 @@
 # BAGCN # A+B+C
 
-agg = "gate2"
-# gate2, gate1, gate, MLP, original
 
 import torch
 import torch.nn
@@ -10,8 +8,8 @@ from helper import *
 
 class Gate(nn.Module):
     def __init__(self,
-                 input1_size , # 200
-                 input2_size , # 400 or 200
+                 input1_size , 
+                 input2_size , 
                  gate_activation=torch.sigmoid):
         super(Gate, self).__init__()
         self.gate_activation = gate_activation
@@ -76,27 +74,9 @@ class BAGCN(torch.nn.Module):
 
         self.activation = activation
 
-        if agg == "MLP": #MLP
-            self.mlp_600_200 = nn.Sequential(  
-                nn.Linear(600, 400),  # 输入维度是600  
-                nn.ReLU(),  
-                nn.Linear(400, 200)  # 输出维度应与in_ent_embed的维度相同，即200  
-            ) 
 
-            self.mlp_400_200 = nn.Sequential(  
-                nn.Linear(400, 300),  # 输入维度是400  
-                nn.ReLU(),  
-                nn.Linear(300, 200)  # 输出维度应与in_ent_embed的维度相同，即200  
-            ) 
-        if agg == "gate":   # gate
-            self.gate_ent = Gate(200,200)
-
-        if agg == "gate1":   # gate
-            self.gate1_ent = Gate(200,400)
-
-        if agg == "gate2":   # gate
-            self.gate2_ent = Gate(200,400)
-            self.gate2_rel = Gate(200,200)
+        self.gate2_ent = Gate(200,400)
+        self.gate2_rel = Gate(200,200)
         # self.bn_ent = torch.nn.BatchNorm1d(out_channels)
         # self.bn_rel = torch.nn.BatchNorm1d(out_channels)
 
@@ -130,54 +110,12 @@ class BAGCN(torch.nn.Module):
         # shape = (N, FOUT) shape = (R, FOUT)
         in_ent_embed,  in_rel_embed= self.aggregate_neighbors(sub_ent_embed_proj, obj_ent_embed_proj, rel_embed_proj, in_index, in_type, ent_embed, num_ent, num_rel, mode='in')
         out_ent_embed, out_rel_embed = self.aggregate_neighbors(sub_ent_embed_proj, obj_ent_embed_proj, rel_embed_proj, out_index, out_type, ent_embed, num_ent, num_rel, mode='out')
-        
-        if agg == "original":    # original
-            update_ent_embed = in_ent_embed + out_ent_embed
+                             
+        concat_ent_embed = torch.cat([in_ent_embed, out_ent_embed], dim=1)
+        update_ent_embed = self.gate2_ent(self.residual_proj_ent(ent_embed),concat_ent_embed)
 
-            update_rel_embed = torch.cat([in_rel_embed, out_rel_embed], dim=0)
-            # in_rel_embed.shape = out_rel_embed.shape = torch.Size([number of relation, gcn_dim])
-            # self.residual_proj_rel(rel_embed).shape = torch.Size([number of relation * 2, gcn_dim])
-
-            # Step 4: Residual/skip connections, bias
-            # shape = (N, FOUT)
-            if self.residual: # True
-                update_ent_embed = update_ent_embed + self.residual_proj_ent(ent_embed)
-
-                update_rel_embed = update_rel_embed + self.residual_proj_rel(rel_embed)
-
-        if agg == "MLP":    # MLP
-            concat_ent_embed = torch.cat([in_ent_embed, out_ent_embed, self.residual_proj_ent(ent_embed)], dim=1)
-            update_ent_embed = self.mlp_600_200(concat_ent_embed)
-
-            update_rel_embed = torch.cat([in_rel_embed, out_rel_embed], dim=0)
-            if self.residual: # True
-                update_ent_embed = update_ent_embed + self.residual_proj_ent(ent_embed)
-
-                update_rel_embed = update_rel_embed + self.residual_proj_rel(rel_embed)
-
-        if agg == "gate":   # gate
-            update_ent_embed = self.gate_ent(in_ent_embed,out_ent_embed)
-
-            update_rel_embed = torch.cat([in_rel_embed, out_rel_embed], dim=0)
-
-            if self.residual: # True
-                update_ent_embed = update_ent_embed + self.residual_proj_ent(ent_embed)
-
-                update_rel_embed = update_rel_embed + self.residual_proj_rel(rel_embed)
-
-        if agg == "gate1":   # gate1           
-            concat_ent_embed = torch.cat([in_ent_embed, out_ent_embed], dim=1)
-            update_ent_embed = self.gate1_ent(self.residual_proj_ent(ent_embed),concat_ent_embed)
-
-            update_rel_embed = torch.cat([in_rel_embed, out_rel_embed], dim=0)
-            update_rel_embed = update_rel_embed + self.residual_proj_rel(rel_embed)
-        
-        if agg == "gate2":   # gate2
-            concat_ent_embed = torch.cat([in_ent_embed, out_ent_embed], dim=1)
-            update_ent_embed = self.gate2_ent(self.residual_proj_ent(ent_embed),concat_ent_embed)
-
-            update_rel_embed = torch.cat([in_rel_embed, out_rel_embed], dim=0)
-            update_rel_embed = self.gate2_rel(update_rel_embed, self.residual_proj_rel(rel_embed))
+        update_rel_embed = torch.cat([in_rel_embed, out_rel_embed], dim=0)
+        update_rel_embed = self.gate2_rel(update_rel_embed, self.residual_proj_rel(rel_embed))
 
         if self.bias_ent is not None: # True
             update_ent_embed += self.bias_ent
