@@ -32,11 +32,6 @@ Now you are ready to train and evaluate KADGN. To reproduce the results provided
 #### Kinship
     python train.py --data kinship --epoch 1000 --batch 128 --gcn_drop 0.4 --embed_dim 300 --num_heads 3
 
-#### Spotify
-    python train.py --data spotify --epoch 1000 --batch 512 --gcn_drop 0.5 --embed_dim 200 --num_heads 3
-
-#### Credit
-    python train.py --data credit --epoch 1000 --batch 128 --gcn_drop 0.5 --embed_dim 300 --num_heads 3
 
 
 ## Acknowledgement
