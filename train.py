@@ -140,26 +140,16 @@ class Runner(object):
         self.data = ddict(list)
         sr2o = ddict(set)
 
-        if self.p.dataset == 'spotify' or self.p.dataset == 'credit':
-            for split in ['train', 'test', 'valid']:
-                for line in open('./data/{}/{}.txt'.format(self.p.dataset, split)):
-                    sub, rel, obj = line.strip().split('\t')
-                    sub, rel, obj = self.ent2id[sub], self.rel2id[rel], self.ent2id[obj]
-                    self.data[split].append((sub, rel, obj))
 
-                    if split == 'train':
-                        sr2o[(sub, rel)].add(obj)
-                        sr2o[(obj, rel + self.p.num_rel)].add(sub)
-        else:
-            for split in ['train', 'test', 'valid']:
-                for line in open('./data/{}/{}.txt'.format(self.p.dataset, split)):
-                    sub, rel, obj = map(str.lower, line.strip().split('\t'))
-                    sub, rel, obj = self.ent2id[sub], self.rel2id[rel], self.ent2id[obj]
-                    self.data[split].append((sub, rel, obj))
+        for split in ['train', 'test', 'valid']:
+            for line in open('./data/{}/{}.txt'.format(self.p.dataset, split)):
+                sub, rel, obj = map(str.lower, line.strip().split('\t'))
+                sub, rel, obj = self.ent2id[sub], self.rel2id[rel], self.ent2id[obj]
+                self.data[split].append((sub, rel, obj))
 
-                    if split == 'train':
-                        sr2o[(sub, rel)].add(obj)
-                        sr2o[(obj, rel + self.p.num_rel)].add(sub)
+                if split == 'train':
+                    sr2o[(sub, rel)].add(obj)
+                    sr2o[(obj, rel + self.p.num_rel)].add(sub)
 
         self.data = dict(self.data)
 
