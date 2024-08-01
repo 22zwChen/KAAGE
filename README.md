@@ -32,7 +32,3 @@ Now you are ready to train and evaluate KADGN. To reproduce the results provided
 #### Kinship
     python train.py --data kinship --epoch 1000 --batch 128 --gcn_drop 0.4 --embed_dim 300 --num_heads 3
 
-
-
-## Acknowledgement
-We refer to the code of [D-AEN](https://github.com/hcfun/D-AEN) and [RAKGE](https://github.com/learndatalab/RAKGE). Thanks for their contributions.
