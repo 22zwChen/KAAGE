@@ -16,7 +16,7 @@ This repository provides PyTorch implementations of **KAAGE** as described in th
 ## Basic Usage
 
 ### preparations
-Since github can't create empty folders, you need to create some folders under the current path before running the code and execute the command as follows:
+Since empty folders are unallowed in Github, you need to create some folders under the current path before running the code and execute the command as follows:
 
     mkdir log ranks ranks_index_top10 results results_index_top10 torch_saved
 
