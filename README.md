@@ -1,4 +1,4 @@
-# KADGN
+# KAAGE
 This repository provides PyTorch implementations of **KAAGE** as described in the paper: **Knowledge Augmented Attention Gating Embedding for Link Prediction**.
 
 
@@ -21,7 +21,7 @@ Since github can't create empty folders, you need to create some folders under t
     mkdir log ranks ranks_index_top10 results results_index_top10 torch_saved
 
 ### Reproduce the results
-Now you are ready to train and evaluate KADGN. To reproduce the results provided in the paper, please execute the corresponding command for each dataset as follows:
+Now you are ready to train and evaluate KAAGE. To reproduce the results provided in the paper, please execute the corresponding command for each dataset as follows:
 
 #### FB15k-237
     python train.py --data FB15k-237 --epoch 1000 --batch 128 --gcn_drop 0.6 --embed_dim 300 --num_heads 3
